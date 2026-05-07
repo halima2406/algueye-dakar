@@ -59,14 +59,7 @@ const Navbar: React.FC = () => {
           {/* Lien Favoris avec compteur (desktop) */}
           <FavoritesLink count={count} variant="desktop" />
 
-          <a
-            href="https://wa.me/221781493510"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-[#D4AF37] text-black px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white transition-colors"
-          >
-            Rendez-vous
-          </a>
+         
         </div>
 
         {/* Mobile Header Right (cœur compact + burger) */}

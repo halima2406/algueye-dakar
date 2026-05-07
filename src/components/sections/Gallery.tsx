@@ -6,10 +6,13 @@ import { useFavorites } from '@/context/FavoritesContext';
 
 const Gallery: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<Category>("Habits d'événements");
+  const [showAll, setShowAll] = useState(false);
+  const VISIBLE_COUNT = 6; // 2 lignes × 3 colonnes
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const filteredItems = getItemsByCategory(activeCategory);
-
+  const visibleItems = showAll ? filteredItems : filteredItems.slice(0, VISIBLE_COUNT);
+  const hasMore = filteredItems.length > VISIBLE_COUNT;
   return (
     <section id="gallery" className="py-24 bg-black text-white overflow-hidden relative">
       {/* Background patterns */}
@@ -77,7 +80,7 @@ const Gallery: React.FC = () => {
               transition={{ duration: 0.4 }}
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
             >
-              {filteredItems.map((item, idx) => (
+              {visibleItems.map((item, idx) => (
                 <GalleryCard
                   key={item.id}
                   item={item}

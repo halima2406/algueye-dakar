@@ -14,8 +14,8 @@ const Footer = () => {
               La maison de couture qui définit le nouveau standard du luxe traditionnel en Afrique. Excellence, Authenticité et Modernité.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="hover:text-[#D4AF37] transition-colors"><Instagram size={20} /></a>
-              <a href="#" className="hover:text-[#D4AF37] transition-colors"><Facebook size={20} /></a>
+              <a href="https://www.instagram.com/algueye_dakar?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" className="hover:text-[#D4AF37] transition-colors"><Instagram size={20} /></a>
+              <a href="https://web.facebook.com/AlGueyeChallenger?locale=fr_FR" className="hover:text-[#D4AF37] transition-colors"><Facebook size={20} /></a>
               <a href="#" className="hover:text-[#D4AF37] transition-colors"><Mail size={20} /></a>
             </div>
           </div>

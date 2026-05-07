@@ -64,7 +64,7 @@ const Events = () => {
                   <p className="text-white/60 font-light max-w-xl">{event.description}</p>
                 </div>
                 <button className="flex items-center gap-2 text-white hover:text-[#D4AF37] transition-colors group-hover:translate-x-2 duration-300">
-                  En savoir plus <ChevronRight size={20} />
+                   <ChevronRight size={20} />
                 </button>
               </div>
             </motion.div>
