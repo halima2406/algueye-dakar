@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { categories, getItemsByCategory, type Category, type GalleryItem } from '@/data/gallery';
 import { useFavorites } from '@/context/FavoritesContext';
+
+const VISIBLE_COUNT = 6; // 2 lignes × 3 colonnes en desktop
 
 const Gallery: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<Category>("Habits d'événements");
   const [showAll, setShowAll] = useState(false);
-  const VISIBLE_COUNT = 6; // 2 lignes × 3 colonnes
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const filteredItems = getItemsByCategory(activeCategory);
   const visibleItems = showAll ? filteredItems : filteredItems.slice(0, VISIBLE_COUNT);
   const hasMore = filteredItems.length > VISIBLE_COUNT;
+
   return (
     <section id="gallery" className="py-24 bg-black text-white overflow-hidden relative">
       {/* Background patterns */}
@@ -51,7 +54,7 @@ const Gallery: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 + idx * 0.1 }}
-                onClick={() => setActiveCategory(cat)}
+                onClick={() => { setActiveCategory(cat); setShowAll(false); }}
                 className={`relative px-4 py-3 text-[10px] md:text-xs uppercase tracking-[0.25em] transition-all duration-700 font-medium ${
                   activeCategory === cat ? 'text-[#D4AF37]' : 'text-zinc-500 hover:text-white'
                 }`}
@@ -78,17 +81,33 @@ const Gallery: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
             >
-              {visibleItems.map((item, idx) => (
-                <GalleryCard
-                  key={item.id}
-                  item={item}
-                  index={idx}
-                  isFav={isFavorite(item.id)}
-                  onToggleFav={() => toggleFavorite(item.id)}
-                />
-              ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                {visibleItems.map((item, idx) => (
+                  <GalleryCard
+                    key={item.id}
+                    item={item}
+                    index={idx}
+                    isFav={isFavorite(item.id)}
+                    onToggleFav={() => toggleFavorite(item.id)}
+                  />
+                ))}
+              </div>
+
+              {/* Bouton Voir plus / Voir moins */}
+              {hasMore && (
+                <div className="mt-12 text-center">
+                  <button
+                    type="button"
+                    onClick={() => setShowAll(!showAll)}
+                    className="inline-flex items-center gap-3 px-8 py-3 border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black transition-all text-xs uppercase tracking-[0.25em] font-medium"
+                  >
+                    {showAll
+                      ? `Voir moins`
+                      : `Voir plus (${filteredItems.length - VISIBLE_COUNT} pièces)`}
+                  </button>
+                </div>
+              )}
             </motion.div>
           ) : (
             <EmptyCategoryState key={`empty-${activeCategory}`} category={activeCategory} />
@@ -112,7 +131,7 @@ const Gallery: React.FC = () => {
   );
 };
 
-// ─── Carte d'une pièce dans la grille ───────────────────────────────────
+// ─── Carte cliquable d'une pièce ────────────────────────────────────────
 interface GalleryCardProps {
   item: GalleryItem;
   index: number;
@@ -128,52 +147,72 @@ const GalleryCard: React.FC<GalleryCardProps> = ({ item, index, isFav, onToggleF
       transition={{ duration: 0.5, delay: Math.min(index, 8) * 0.05 }}
       className="group relative"
     >
-      <div className="aspect-[3/4] overflow-hidden rounded-sm bg-zinc-900 relative shadow-2xl">
-        <img
-          src={item.image}
-          alt={item.title}
-          loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
-        />
-
-        {/* Overlay dégradé en bas */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-
-        {/* Bouton cœur — toujours visible en haut à droite */}
-        <button
-          type="button"
-          onClick={onToggleFav}
-          aria-label={isFav ? `Retirer ${item.title} des favoris` : `Ajouter ${item.title} aux favoris`}
-          aria-pressed={isFav}
-          className="absolute top-4 right-4 w-11 h-11 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md border border-white/10 hover:bg-black/60 hover:border-[#D4AF37]/50 transition-all duration-300 z-10"
-        >
-          <Heart
-            size={20}
-            strokeWidth={1.8}
-            className={`transition-all duration-300 ${
-              isFav
-                ? 'fill-red-500 stroke-red-500 scale-110'
-                : 'fill-transparent stroke-white'
+      {/* Toute la carte est un Link vers la page détail */}
+      <Link to={`/piece/${item.id}`} className="block">
+        <div className="aspect-[3/4] overflow-hidden rounded-sm bg-zinc-900 relative shadow-2xl">
+          {/* Image principale */}
+          <img
+            src={item.image}
+            alt={item.title}
+            loading="lazy"
+            className={`absolute inset-0 w-full h-full object-cover transition-all duration-[1.5s] ease-out group-hover:scale-110 ${
+              item.hoverImage ? 'group-hover:opacity-0' : ''
             }`}
           />
-        </button>
 
-        {/* Catégorie + titre + description en bas */}
-        <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col justify-end">
-          <span className="text-[#D4AF37] text-[10px] uppercase tracking-[0.3em] mb-2 font-medium">
-            {item.category}
-          </span>
-          <h3 className="text-xl md:text-2xl font-serif mb-2 text-white">{item.title}</h3>
-          <p className="text-white/60 text-sm font-light leading-relaxed line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-            {item.description}
-          </p>
+          {/* Image au survol (si fournie) */}
+          {item.hoverImage && (
+            <img
+              src={item.hoverImage}
+              alt={`${item.title} — vue alternative`}
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-out"
+            />
+          )}
+
+          {/* Overlay dégradé */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+
+          {/* Catégorie + titre + description */}
+          <div className="absolute inset-x-0 bottom-0 p-6 flex flex-col justify-end">
+            <span className="text-[#D4AF37] text-[10px] uppercase tracking-[0.3em] mb-2 font-medium">
+              {item.category}
+            </span>
+            <h3 className="text-xl md:text-2xl font-serif mb-2 text-white">{item.title}</h3>
+            <p className="text-white/60 text-sm font-light leading-relaxed line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              {item.description}
+            </p>
+          </div>
         </div>
-      </div>
+      </Link>
+
+      {/* Bouton cœur — au-dessus du Link */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onToggleFav();
+        }}
+        aria-label={isFav ? `Retirer ${item.title} des favoris` : `Ajouter ${item.title} aux favoris`}
+        aria-pressed={isFav}
+        className="absolute top-4 right-4 w-11 h-11 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-md border border-white/10 hover:bg-black/60 hover:border-[#D4AF37]/50 transition-all duration-300 z-10"
+      >
+        <Heart
+          size={20}
+          strokeWidth={1.8}
+          className={`transition-all duration-300 ${
+            isFav
+              ? 'fill-red-500 stroke-red-500 scale-110'
+              : 'fill-transparent stroke-white'
+          }`}
+        />
+      </button>
     </motion.div>
   );
 };
 
-// ─── État vide (catégorie sans images, ex: Mariage) ─────────────────────
+// ─── État vide ──────────────────────────────────────────────────────────
 const EmptyCategoryState: React.FC<{ category: Category }> = ({ category }) => {
   return (
     <motion.div

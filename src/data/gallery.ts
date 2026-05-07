@@ -8,7 +8,16 @@ export interface GalleryItem {
   title: string;
   category: Category;
   image: string;
+  hoverImage?: string; // Image affichée au survol (optionnelle)
   description: string;
+  // Détails additionnels affichés sur la page produit
+  details?: {
+    matiere?: string;
+    coupe?: string;
+    occasion?: string;
+    coloris?: string;
+    soin?: string;
+  };
 }
 
 export const categories: Category[] = [
@@ -295,5 +304,99 @@ export const getItemsByCategory = (category: Category): GalleryItem[] => {
 
 // Helper : retrouve un item par son id
 export const getItemById = (id: string): GalleryItem | undefined => {
-  return galleryItems.find(item => item.id === id);
+  // On cherche d'abord dans la galerie principale
+  const fromGallery = galleryItems.find(item => item.id === id);
+  if (fromGallery) return fromGallery;
+  // Sinon on cherche dans la collection Naru Goor
+  return naruGoorItems.find(item => item.id === id);
+};
+
+// ──────────────────────────────────────────────────────────────────────
+// NARU GOOR — Sous-marque masculine d'ALGUEYE
+// ──────────────────────────────────────────────────────────────────────
+// "Naru Goor" en wolof évoque la virilité et l'élégance masculine.
+// Cette ligne reprend les pièces homme d'ALGUEYE dans une narration
+// dédiée, signée "by ALGUEYE".
+
+export interface NaruGoorItem extends GalleryItem {
+  // Hérite de GalleryItem mais sa "catégorie" reste "Homme"
+  // car Naru Goor est une sous-marque, pas une catégorie de la galerie principale.
+}
+
+export const naruGoorItems: NaruGoorItem[] = [
+  {
+    id: "ng-01",
+    title: "Terre de Feu",
+    category: "Homme",
+    image: "/images/algueye/homme/h-01-rouge-brique.jpg",
+    description: "Ensemble en maille texturée rouge brique. Le chic urbain version Naru Goor : décontracté mais affirmé.",
+    details: {
+      matiere: "Maille technique texturée",
+      coupe: "Ensemble t-shirt zippé + pantalon ample",
+      occasion: "Streetwear chic, week-end",
+      coloris: "Rouge brique",
+      soin: "Lavage à 30°C, séchage à plat",
+    },
+  },
+  {
+    id: "ng-02",
+    title: "Bleu Nuit Souverain",
+    category: "Homme",
+    image: "/images/algueye/homme/h-02-bleu-marine.jpg",
+    description: "Silhouette épurée en bleu marine. La discrétion qui en dit long — pour l'homme qui n'a rien à prouver.",
+    details: {
+      matiere: "Maille fine",
+      coupe: "T-shirt zippé + pantalon large",
+      occasion: "Quotidien élégant, déplacement",
+      coloris: "Bleu marine profond",
+      soin: "Lavage à 30°C, séchage à plat",
+    },
+  },
+  {
+    id: "ng-03",
+    title: "Lurex de Nuit",
+    category: "Homme",
+    image: "/images/algueye/homme/h-03-tank-lurex.jpg",
+    description: "Tank lurex et pantalon large. L'audace du soir — le tank scintille, la veste à motifs accompagne.",
+    details: {
+      matiere: "Lurex métallisé + tissu fluide",
+      coupe: "Tank ajusté + pantalon ample",
+      occasion: "Soirée, sortie nocturne",
+      coloris: "Argent / noir",
+      soin: "Lavage à la main recommandé",
+    },
+  },
+  {
+    id: "ng-04",
+    title: "Encre & Or",
+    category: "Homme",
+    image: "/images/algueye/homme/h-04-kimono-encre.jpg",
+    description: "Le kimono signature de Naru Goor. Soie sombre traversée d'éclats dorés — pièce d'apparat masculine.",
+    details: {
+      matiere: "Soie noire à reflets dorés",
+      coupe: "Kimono ample, ceinture intégrée",
+      occasion: "Cérémonie, événement de prestige",
+      coloris: "Encre noire & or",
+      soin: "Pressing exclusivement",
+    },
+  },
+  {
+    id: "ng-05",
+    title: "Héritage Tissé",
+    category: "Homme",
+    image: "/images/algueye/homme/h-05-veste-motifs.jpg",
+    description: "Veste à motifs traditionnels tissés, hommage au patrimoine textile sénégalais. La modernité ancrée dans la racine.",
+    details: {
+      matiere: "Tissage traditionnel multicolore",
+      coupe: "Veste structurée à zip doré",
+      occasion: "Cérémonie, événement culturel",
+      coloris: "Multicolore sur base noire",
+      soin: "Pressing recommandé",
+    },
+  },
+];
+
+// Helper : récupère tous les items Naru Goor
+export const getNaruGoorItems = (): NaruGoorItem[] => {
+  return naruGoorItems;
 };

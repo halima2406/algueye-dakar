@@ -1,26 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Instagram, Phone, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
 import { useFavorites } from '@/context/FavoritesContext';
 
-const navLinks = [
-  { name: 'Accueil', href: '#' },
-  { name: 'À Propos', href: '#about' },
-  { name: 'Collections', href: '#gallery' },
-  { name: 'Événements', href: '#events' },
-  { name: 'Contact', href: '#contact' },
+// Liens vers les ancres de la page d'accueil
+const homeAnchors = [
+  { name: 'À Propos', anchor: '#about' },
+  { name: 'Collections', anchor: '#gallery' },
+  { name: 'Événements', anchor: '#events' },
+  { name: 'Contact', anchor: '#contact' },
 ];
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { count } = useFavorites();
+  const location = useLocation();
+  const isHome = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Helper : sur la home → ancre directe; ailleurs → on retourne à la home avec ancre
+  const getAnchorHref = (anchor: string) => (isHome ? anchor : `/${anchor}`);
 
   return (
     <nav
@@ -35,31 +41,44 @@ const Navbar: React.FC = () => {
           animate={{ opacity: 1, x: 0 }}
           className="flex items-center"
         >
-          <a href="#" className="block" aria-label="ALGUEYE DAKAR - Accueil">
+          <Link to="/" className="block" aria-label="ALGUEYE DAKAR - Accueil">
             <img
               src="/images/algueye/logo-blanc.png"
               alt="ALGUEYE DAKAR"
               className="h-16 md:h-20 w-auto object-contain"
             />
-          </a>
+          </Link>
         </motion.div>
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center space-x-8">
-          {navLinks.map((link) => (
+          <Link
+            to="/"
+            className="text-white/80 hover:text-[#D4AF37] transition-colors text-sm uppercase tracking-widest"
+          >
+            Accueil
+          </Link>
+
+          {homeAnchors.map((link) => (
             <a
               key={link.name}
-              href={link.href}
+              href={getAnchorHref(link.anchor)}
               className="text-white/80 hover:text-[#D4AF37] transition-colors text-sm uppercase tracking-widest"
             >
               {link.name}
             </a>
           ))}
 
+          {/* Lien Naru Goor */}
+          <Link
+            to="/naru-goor"
+            className="text-white/80 hover:text-[#D4AF37] transition-colors text-sm uppercase tracking-widest"
+          >
+            Naru Goor
+          </Link>
+
           {/* Lien Favoris avec compteur (desktop) */}
           <FavoritesLink count={count} variant="desktop" />
-
-         
         </div>
 
         {/* Mobile Header Right (cœur compact + burger) */}
@@ -86,28 +105,49 @@ const Navbar: React.FC = () => {
             className="md:hidden bg-black border-t border-white/10 overflow-hidden"
           >
             <div className="flex flex-col space-y-4 px-6 py-8">
-              {navLinks.map((link) => (
+              <Link
+                to="/"
+                onClick={() => setIsOpen(false)}
+                className="text-white text-lg font-light tracking-widest"
+              >
+                Accueil
+              </Link>
+
+              {homeAnchors.map((link) => (
                 <a
                   key={link.name}
-                  href={link.href}
+                  href={getAnchorHref(link.anchor)}
                   onClick={() => setIsOpen(false)}
                   className="text-white text-lg font-light tracking-widest"
                 >
                   {link.name}
                 </a>
               ))}
-              {/* Lien Favoris dans menu mobile (texte) */}
-              <a
-                href="#favorites"
+
+              <Link
+                to="/naru-goor"
+                onClick={() => setIsOpen(false)}
+                className="text-white text-lg font-light tracking-widest"
+              >
+                Naru Goor
+              </Link>
+
+              {/* Lien Favoris dans menu mobile */}
+              <Link
+                to="/favoris"
                 onClick={() => setIsOpen(false)}
                 className="text-white text-lg font-light tracking-widest flex items-center gap-3"
               >
-                <Heart size={20} className={count > 0 ? 'fill-red-500 stroke-red-500' : 'stroke-white'} />
+                <Heart
+                  size={20}
+                  className={count > 0 ? 'fill-red-500 stroke-red-500' : 'stroke-white'}
+                />
                 Favoris
                 {count > 0 && (
                   <span className="text-[#D4AF37] text-sm">({count})</span>
                 )}
-              </a>
+              </Link>
+
               <div className="pt-4 flex space-x-6">
                 <Instagram className="text-white/60" />
                 <Phone className="text-white/60" />
@@ -131,8 +171,8 @@ const FavoritesLink: React.FC<FavoritesLinkProps> = ({ count, variant }) => {
 
   if (variant === 'mobile-compact') {
     return (
-      <a
-        href="#favorites"
+      <Link
+        to="/favoris"
         aria-label={`Voir mes favoris (${count})`}
         className="relative w-10 h-10 flex items-center justify-center text-white/80 hover:text-[#D4AF37] transition-colors"
       >
@@ -146,21 +186,23 @@ const FavoritesLink: React.FC<FavoritesLinkProps> = ({ count, variant }) => {
             {count > 99 ? '99+' : count}
           </span>
         )}
-      </a>
+      </Link>
     );
   }
 
   // Desktop
   return (
-    <a
-      href="#favorites"
+    <Link
+      to="/favoris"
       aria-label={`Voir mes favoris (${count})`}
       className="relative flex items-center gap-2 text-white/80 hover:text-[#D4AF37] transition-colors text-sm uppercase tracking-widest group"
     >
       <Heart
         size={18}
         strokeWidth={1.8}
-        className={`transition-all ${hasFavorites ? 'fill-red-500 stroke-red-500' : 'group-hover:scale-110'}`}
+        className={`transition-all ${
+          hasFavorites ? 'fill-red-500 stroke-red-500' : 'group-hover:scale-110'
+        }`}
       />
       <span>Favoris</span>
       {hasFavorites && (
@@ -168,7 +210,7 @@ const FavoritesLink: React.FC<FavoritesLinkProps> = ({ count, variant }) => {
           {count > 99 ? '99+' : count}
         </span>
       )}
-    </a>
+    </Link>
   );
 };
 

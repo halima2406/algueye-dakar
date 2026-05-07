@@ -1,18 +1,17 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 
 const Hero = () => {
   return (
-    <section className="relative h-screen w-full overflow-hidden flex items-center justify-center">
+    <section className="relative h-screen w-full overflow-hidden flex items-center justify-center pt-32 md:pt-40">
       {/* Background Image */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-10000"
-        style={{ 
+        style={{
           backgroundImage: `url('https://storage.googleapis.com/dala-prod-public-storage/generated-images/bc0cfbaf-e50d-4931-87e2-fd3c82dbe087/hero-image-033d9829-1777976242548.webp')`,
-          transform: 'scale(1.1)'
+          transform: 'scale(1.1)',
         }}
       />
-      
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
 
@@ -20,13 +19,13 @@ const Hero = () => {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
         >
           <span className="text-[#D4AF37] uppercase tracking-[0.5em] text-sm mb-6 block font-medium">
             Haute Couture Sénégalaise
           </span>
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-8 leading-tight">
-            L’élégance traditionnelle <br className="hidden md:block" />
+            L'élégance traditionnelle <br className="hidden md:block" />
             <span className="italic">réinventée</span> à Dakar
           </h1>
           <p className="text-white/70 text-lg md:text-xl font-light mb-12 max-w-2xl mx-auto leading-relaxed">
@@ -50,7 +49,7 @@ const Hero = () => {
       </div>
 
       {/* Scroll indicator */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 1 }}
